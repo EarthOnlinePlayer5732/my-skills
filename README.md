@@ -1,33 +1,19 @@
 # AI Research Automation Toolkit
 
-我的 AI 科研自动化 skill 集合。整合社区优秀的开源 skill + 自己设计的 workflow，用于 Claude Code 驱动的科研全流程。
-
-## 快速安装
-
-```bash
-git clone https://github.com/你的用户名/ai-research-toolkit.git
-cd ai-research-toolkit
-
-# 安装所有 skill（上游 + 自定义）
-cp -r skills/upstream/* ~/.claude/skills/
-cp -r skills/custom/* ~/.claude/skills/
-
-# 配置 MCP（需要 Codex CLI）
-bash configs/mcp-setup.sh
-```
+个人自用 科研/自动化 skill 集合。主要是Claude Code驱动
 
 ## Skill 列表
 
-### 自定义 skill（我的原创）
+### 自定义 skill（我的搞得）
 
-针对自己在科研中反复踩的坑设计的 skill：
+针对自己在科研中反复踩的坑设计的 skill（可能有过时的）：
 
 | Skill | 解决的问题 | 触发命令 |
 |-------|-----------|---------|
 | [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 委托子 Agent 时上下文总是给不全 | `/context-handoff-checklist` |
 | [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 实验中的发现忘了记录就丢了 | `/auto-discovery-logger` |
 | [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 手动调参效率低，Agent 自动循环优化 | `/ai4ai-model-optimizer` |
-| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 单模型自查抓不到自己的错 | `/cross-model-verifier` |
+| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 单模型自查抓不到自己的错（这个其实似乎都有点多余了） | `/cross-model-verifier` |
 
 ### 上游 skill（精选）
 
