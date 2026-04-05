@@ -1,0 +1,22 @@
+{
+  "_comment": "Claude Code 自动放行配置 — 用于无人值守研究循环",
+  "_warning": "仅在信任项目代码时使用。允许 Claude 自动执行 SSH、文件写入等操作。",
+  "permissions": {
+    "allow": [
+      "mcp__codex__codex",
+      "mcp__codex__codex-reply",
+      "Write",
+      "Edit",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(rsync *)",
+      "Bash(screen *)",
+      "Bash(tmux *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(python *)",
+      "Bash(pip *)"
+    ]
+  }
+}
