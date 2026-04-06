@@ -13,7 +13,7 @@
 | [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 委托子 Agent 时上下文总是给不全 | `/context-handoff-checklist` |
 | [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 实验中的发现忘了记录就丢了 | `/auto-discovery-logger` |
 | [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | Agent 自动循环调参优化 | `/ai4ai-model-optimizer` |
-| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 单模型自查抓不到自己的错（这个其实似乎都有点多余了） | `/cross-model-verifier` |
+| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 单模型自查抓不到自己的错 | `/cross-model-verifier` |
 
 ### 上游 skill（精选）
 
