@@ -27,5 +27,5 @@
 ## Skill 使用
 
 本项目包含以下自定义 skill：
-- `/ai4ai-model-optimizer` — Agent 驱动的模型自动优化
-- `/cross-model-verifier` — 多模型交叉验证实验结果
+- `/ai4ai-model-optimizer` — 证据驱动的瓶颈诊断与有界实验规划；默认只规划
+- `/cross-model-verifier` — 确定性检查优先的结果审计；模型意见只作补充

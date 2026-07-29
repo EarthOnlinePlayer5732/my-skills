@@ -1,4 +1,4 @@
-# AI4AI 实践笔记：Agent 自动优化模型
+# AI4AI 实践笔记：证据驱动的模型实验迭代
 
 ## 概念溯源
 
@@ -20,16 +20,16 @@ Stanford Agentic Reviewer 按 ICLR 标准评审后发现，FARS 生成论文的�
 
 ### 核心思想提炼
 
-AI4AI 的本质：**把 Agent 的优化目标从"论文分数"换成"模型指标"**。
+AI4AI 的研究设想是把 Agent 的关注点从“论文分数”转向模型指标与实验判断。仓库中的 v2 skill 采用更保守的落地方式：默认只做证据诊断和实验规划，不把“持续提升指标”当作保证。
 
 Auto-review-loop 的循环是：
 ```
 审稿 → 改文 → 再审（目标：reviewer score ≥ 6）
 ```
 
-AI4AI 的循环是：
+获得明确执行授权后的受控迭代是：
 ```
-评估 → 改代码/超参 → 再训练（目标：metric 持续提升）
+核验基线与评估 → 提出可证伪假设 → 单一主要改动 → 再训练/重评
 ```
 
 ## 与现有工具的结合思路
@@ -44,12 +44,12 @@ AI4AI 的循环是：
 
 ### 方案二：结合 OMP pipeline
 
-在 OMP 的 Experiment 阶段插入 AI4AI 循环：
+在 OMP 的 Experiment 阶段插入 AI4AI 诊断与受控迭代：
 ```
-Survey → Ideation → [AI4AI 循环: 自动优化模型] → Publication
+Survey → Ideation → [AI4AI: plan-only → 授权后 execute] → Publication
 ```
 
-这样可以利用 OMP 的前期调研和后期写作能力，中间的实验迭代交给 AI4AI。
+这样可以利用 OMP 的前期调研和后期写作能力，同时保留中间实验方向、预算和停止条件的人类决策点。
 
 ## 实际约束与风险
 
@@ -60,4 +60,4 @@ Survey → Ideation → [AI4AI 循环: 自动优化模型] → Publication
 
 ## 可落地的最小实现
 
-→ 参见 [skills/ai4ai-model-optimizer/SKILL.md](../skills/ai4ai-model-optimizer/SKILL.md)
+→ 参见 [skills/custom/ai4ai-model-optimizer/SKILL.md](../skills/custom/ai4ai-model-optimizer/SKILL.md)

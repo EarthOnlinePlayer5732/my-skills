@@ -44,13 +44,13 @@ Week 1              Week 2-3              Week 4              Week 5
 /omp:experiment                     # Experiment Driver 设计并运行实验
 # → 产出：初始实验结果
 
-/ai4ai-model-optimizer "optimize [model] on [dataset]"
-# → 产出：AI4AI_LOG.md, BEST_CONFIG.json
-# AI4AI 循环自动优化模型，找到最佳配置
+/ai4ai-model-optimizer "plan-only: diagnose [model] on [dataset]"
+# → 产出：证据诊断、首选实验、后备实验、预算与停止条件
+# 只有明确授权 execute 后才修改代码或运行有预算的实验
 
 /cross-model-verifier "verify experiment results"
-# → 产出：VERIFICATION_REPORT.md
-# 多模型交叉验证结果正确性
+# → 产出：.research/audits/<timestamp>-<target>.md
+# 先独立重算并检查数据、评估和基线；模型审查只作补充
 ```
 
 ### 阶段三：Paper Write + Review（循环驱动）
@@ -83,9 +83,9 @@ python codex_bridge.py --cd "." --PROMPT "Final review: check all citations exis
 ```
 OMP survey      → literature_bank.md    → OMP ideate
 OMP ideate      → research_brief.json   → OMP experiment
-OMP experiment  → 初始结果               → AI4AI optimizer
-AI4AI optimizer → BEST_CONFIG.json      → 最终实验
-Cross-verifier  → VERIFICATION_REPORT   → OMP write
+OMP experiment  → 初始结果与原始证据      → AI4AI diagnosis
+AI4AI diagnosis → 有界实验计划/运行结果卡  → 最终实验
+Cross-verifier  → .research/audits/*     → OMP write
 OMP write       → paper/*.tex           → Auto-review-loop
 Auto-review     → AUTO_REVIEW.md        → OMP review
 ```
@@ -94,6 +94,6 @@ Auto-review     → AUTO_REVIEW.md        → OMP review
 
 1. **不要试图一口气跑完**。每个阶段都需要人工判断点。
 2. **Survey 阶段多花时间**。idea 的质量决定后面所有工作的价值。
-3. **AI4AI 循环设 budget**。MAX_GPU_HOURS = 8 通常足够初步探索。
+3. **先用 AI4AI 的 `plan-only` 模式**。进入 `execute` 前由用户确认数据划分、预算和停止条件，不使用通用固定 GPU 时长。
 4. **Auto-review-loop 从 medium 开始**。确认流程跑通后再升 hard/nightmare。
 5. **提交前必须 cross-verify**。尤其是 metric 计算和数据泄漏检查。

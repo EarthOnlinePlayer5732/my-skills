@@ -4,16 +4,18 @@
 
 ## Skill 列表
 
-### 自定义 skill（我的搞得）
+### 自定义 skill
 
-针对自己在科研中反复踩的坑设计的 skill（可能有过时的）：
+这些 skill 来自真实科研与代码智能体协作中的重复问题。它们共享 [科研工作流记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md) 下的 `.research/` 状态与证据记录，能够在任务交接、实验记录、迭代规划和结果审计之间传递同一套项目上下文。
 
 | Skill | 解决的问题 | 触发命令 |
 |-------|-----------|---------|
-| [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 委托子 Agent 时上下文总是给不全 | `/context-handoff-checklist` |
-| [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 实验中的发现忘了记录就丢了 | `/auto-discovery-logger` |
-| [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | Agent 自动循环调参优化 | `/ai4ai-model-optimizer` |
-| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 单模型自查抓不到自己的错 | `/cross-model-verifier` |
+| [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 为跨 Agent、跨模型和跨会话任务生成带代码版本、证据位置与操作边界的交接包 | `/context-handoff-checklist` |
+| [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 将实验中的观察、假设、决定和负面结果记录为可追溯事件 | `/auto-discovery-logger` |
+| [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 基于实验日志诊断瓶颈并规划下一轮验证；只有明确授权后才修改代码或运行实验 | `/ai4ai-model-optimizer` |
+| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 先独立重算和检查数据、评估与基线，再使用不同模型补充审查和分歧分析 | `/cross-model-verifier` |
+
+运行 `install.sh` 会安装共享约定。手工复制单个自定义 skill 时，也要同时复制 `skills/custom/_shared/`，否则相对引用无法解析。v2 的行为与产物迁移见 [UPGRADE_NOTES.md](UPGRADE_NOTES.md)。
 
 ### 上游 skill（精选）
 
