@@ -55,21 +55,21 @@ GPT 的 review 会涵盖：逻辑漏洞、缺失实验、叙事弱点、投稿�
 ```bash
 python codex_bridge.py \
   --cd "/path/to/project" \
-  --PROMPT "Review the evaluation code in eval.py. Check: (1) metric computation correctness, (2) data leakage risks, (3) reproducibility issues. Report as VERIFIED/SUSPICIOUS/ERROR for each."
+  --PROMPT "Review the evaluation code in eval.py. Check: (1) metric computation correctness, (2) data leakage risks, (3) reproducibility issues. Report each as CHECKED, CONTRADICTED, or UNRESOLVED, with evidence."
 ```
 
 ### Step 4: 综合与去重
 
-三个来源的意见会有重叠。综合时：
+三个来源的意见会有重叠。综合时不按模型票数裁决，而按可检查证据、问题严重性和来源独立性排序：
 
-1. **三方都提到的问题** → 最高优先级（P0），必须修复
-2. **两方提到的问题** → 高优先级（P1），应该修复
-3. **只有一方提到的问题** → 中优先级（P2），评估是否值得修复
-4. **互相矛盾的意见** → 需要人工判断，记录分歧理由
+1. **可复现的代码、数据或指标错误** → 按影响定 P0/P1，并引用原始证据
+2. **有独立证据支持的研究缺口** → 评估其对主张的影响和修复成本
+3. **只有模型意见、没有可检查证据的问题** → 保留为待验证候选，不因多方同意自动升级
+4. **互相矛盾的意见** → 区分事实、口径、解释和价值判断；优先用重算或代码检查解决
 
 ### Step 5: 迭代修复
 
-按优先级修复，每修复一个 P0 问题后重新运行 Step 2 确认。
+按优先级修复。每修复一个 P0 问题后先运行对应的确定性回归检查，再按需请求独立模型复审。
 
 ## 与纯 auto-review-loop 的区别
 

@@ -22,13 +22,13 @@ nightmare 模式更"残忍"——GPT 通过 `codex exec` 直接读整个 repo，
 
 我的做法通常是直接让主模型"把相关内容发给 Codex"，但主模型自己决定发什么、省略什么。结果 Codex 那边拿到的上下文经常是残缺的——缺少实验的背景、缺少之前的结论、缺少关键的数据细节。Codex 基于不完整信息给出的分析自然也不靠谱，反馈回来之后主模型又基于这个不靠谱的分析做决策，误差就一层层累积了。
 
-读了 auto-review-loop 的 Phase A 之后才意识到，**他们在 prompt 里非常明确地规定了要发给 reviewer 什么**：完整的研究上下文（claims、methods、results、known weaknesses）、上一轮的变更、当前的 metrics。不是让 Claude 自行决定发什么，而是在 skill 层面强制要求 "Send comprehensive context"。
+读了 auto-review-loop 的 Phase A 之后才意识到，**prompt 必须明确规定 reviewer 完成任务所需的证据**：研究目标、关键 claims、方法和结果、已知弱点、上一轮变更与当前 metrics。重点不是无差别发送全部历史，而是让每项事实都能定位，同时避免遗漏会改变判断的材料。
 
 这个设计背后的假设是：**如果你不在 skill 里明确写死"必须发送哪些上下文"，模型就会偷懒或者遗漏**。这和我自己的经验完全吻合。
 
 GuDaStudio 的 CLAUDE.md 也有类似的思路——4 步协作流程里，第 1 步就是"将用户需求、初始思路**告知** codex"，而不是"让 Claude 自己决定告诉 Codex 什么"。
 
-**教训**：给子 Agent 的上下文，必须在 prompt / skill 层面用 checklist 形式硬性规定，不能依赖模型的"自觉"。
+**教训**：给子 Agent 的上下文，要在 prompt / skill 层面按任务类型规定最低证据、操作边界和成功标准；既不能依赖模型“自觉”，也不应倾倒无关历史。
 
 ---
 
@@ -42,11 +42,11 @@ auto-review-loop 的 Phase E 设计直接解决了这个问题：**每轮结束�
 - [Round 2] [negative]: Main improvement claim failed to reproduce under seed study (F1: 0.72 → 0.71)
 ```
 
-这看起来是很小的设计，但它解决了一个根本问题：**依赖人去记录 = 一定会遗漏**。把记录变成 workflow 的强制步骤，才能保证每个发现都被保留。
+这看起来是很小的设计，但它解决了一个根本问题：**依赖人去记录 = 一定会遗漏**。把记录变成 workflow 的固定步骤，才能保留会影响后续判断的观察、假设、决定和负面结果；低价值操作流水账则应过滤掉。
 
 Oh-my-paper 的 Conductor 也有同样的设计——"每当任何子任务完成，立即更新 tasks.json 和 project_truth.md，无需用户提示"。甚至有一条警告："如果你忘记更新，用户会运行 /omp:sync 强制重建——这意味着你的自动更新失职了。"
 
-**个人想法**：如果我以后自己设计 Agent workflow，第一件事就是把"自动记录"设计成不可跳过的步骤，而不是一个需要人提醒的可选操作。
+**个人想法**：如果我以后自己设计 Agent workflow，第一件事就是把“重要事件自动记录”设计成固定步骤，同时把 observation、interpretation 和 hypothesis 分开，避免把模型解释沉淀成事实。
 
 ---
 
@@ -102,7 +102,7 @@ GuDaStudio 的 codex_bridge.py 只有 ~290 行，但有几个不读源码注意�
 
 ## 8. AI 科研自动化的定位：加速器，不是替代者
 
-所有循环类 workflow 都面临"什么时候停"的问题——auto-review-loop 用 score ≥ 6 做阈值，但分数是 GPT 的主观判断；AI4AI 用 metric 收敛，但 ε 多大合理取决于任务。MAX_ROUNDS 是兜底方案，但够不够完全看问题复杂度。
+所有循环类 workflow 都面临“什么时候停”的问题——auto-review-loop 用 score 阈值，但分数是 GPT 的主观判断；AI4AI v2 则要求用户按任务定义目标、预算和停止条件，避免把通用 ε 或固定轮数硬套到不同实验。
 
 目前没有一个工具真正解决了"何时停止"。这些工具能帮你从 5 分到 7 分（自动化地消除明显弱点），但从 7 分到 9 分——选择正确的问题、做出有品味的判断——仍然是人的工作。
 

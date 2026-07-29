@@ -43,13 +43,13 @@ claude mcp add codex -s user -- codex mcp-server
 
 **局限**：只做代码层面的协作，不涉及论文写作或实验管理。
 
-### 场景四：想让 Agent 自动优化模型超参/架构
+### 场景四：想诊断模型瓶颈并规划受控迭代
 
 **推荐：AI4AI 思路 + 自定义 skill**
 
-理由：没有现成的一键方案，但可以组合 Auto-review-loop 的循环机制 + 自定义的模型优化 skill。核心是把"评审论文"替换为"评估模型指标"。
+理由：自定义 skill 默认从日志和错误分析中诊断瓶颈，先给出可证伪实验；只有明确授权并设定预算、数据划分和停止条件后才执行迭代。
 
-→ 参见 [skills/ai4ai-model-optimizer](../skills/ai4ai-model-optimizer/SKILL.md)
+→ 参见 [skills/custom/ai4ai-model-optimizer](../skills/custom/ai4ai-model-optimizer/SKILL.md)
 
 ---
 
@@ -121,9 +121,9 @@ Claude (执行者) ←──── MCP/CLI ────→ GPT/Codex (评审者/
 **优点**：真正的并行视角，消除自我评估偏差。
 **缺点**：通信开销，需要管理对话状态（threadId/SESSION_ID）。
 
-### 模式三：自主循环（AI4AI / autoresearch）
+### 模式三：受控实验循环（AI4AI / autoresearch）
 
-单个 Agent 或 Agent 系统在无人监督下持续运行实验循环。
+单个 Agent 或 Agent 系统可以运行实验循环，但仓库中的 AI4AI v2 默认只规划；进入执行前需要用户确认预算、数据划分、修改范围和停止条件。
 
 ```
 while not converged and within_budget:
@@ -133,8 +133,8 @@ while not converged and within_budget:
     train_and_evaluate()
 ```
 
-**优点**：overnight 无人值守，完全自主。
-**缺点**：需要非常可靠的安全约束，否则可能浪费大量计算资源。
+**优点**：获得授权后可以自动化重复的诊断、单因素实验和结果记录。
+**缺点**：仍需要可靠的有效性检查和预算约束，否则可能浪费计算资源或对最终测试集过拟合。
 
 ---
 

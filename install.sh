@@ -11,19 +11,36 @@ SKILL_DIR="$HOME/.claude/skills"
 
 mkdir -p "$SKILL_DIR"
 
+copy_skill_dir() {
+    source_dir="$1"
+    target_name="$2"
+    target_dir="$SKILL_DIR/$target_name"
+
+    mkdir -p "$target_dir"
+    cp -R "${source_dir%/}/." "$target_dir/"
+}
+
 echo -e "${GREEN}=== Installing AI Research Toolkit Skills ===${NC}"
 
 # 安装上游 skill
 for skill in "$SCRIPT_DIR"/skills/upstream/*/; do
     name=$(basename "$skill")
-    cp -r "$skill" "$SKILL_DIR/$name"
+    copy_skill_dir "$skill" "$name"
     echo -e "${GREEN}✓${NC} $name (upstream)"
 done
 
-# 安装自定义 skill
+# 安装自定义 skill 共用的支持文件
+shared_dir="$SCRIPT_DIR/skills/custom/_shared"
+if [[ -d "$shared_dir" ]]; then
+    copy_skill_dir "$shared_dir" "_shared"
+    echo -e "${GREEN}✓${NC} _shared (support)"
+fi
+
+# 安装自定义 skill；跳过支持目录，避免把它显示成可调用 skill
 for skill in "$SCRIPT_DIR"/skills/custom/*/; do
     name=$(basename "$skill")
-    cp -r "$skill" "$SKILL_DIR/$name"
+    [[ "$name" == "_shared" ]] && continue
+    copy_skill_dir "$skill" "$name"
     echo -e "${GREEN}✓${NC} $name (custom)"
 done
 

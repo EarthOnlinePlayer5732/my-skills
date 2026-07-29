@@ -12,12 +12,12 @@
      │  1. 分析上一轮结果                      │
      │  （激活 auto-discovery-logger）         │
      │                                       │
-     │  2. 发现问题 → 自动记录                  │
+     │  2. 发现影响判断的事件 → 追加记录          │
      │                                       │
      │  3. 决定修改方案                        │
      │     ├─ 需要 Codex 意见？                │
      │     │  → context-handoff-checklist     │
-     │     │  → 发送完整上下文给 Codex          │
+     │     │  → 发送经授权、裁剪和脱敏的证据包    │
      │     │  → 收到反馈，综合判断              │
      │     └─ 自己能决定？直接改               │
      │                                       │
@@ -42,7 +42,8 @@ claude
 # 激活发现记录
 > /auto-discovery-logger "ASQP 实验第 N 轮分析"
 
-# 然后正常分析结果，发现会被自动记录到 DISCOVERY_LOG.md
+# 然后正常分析结果；重要事件追加到 .research/events.jsonl
+# 有充分证据的当前状态同步到 .research/state.md
 > 分析 results/eval_output.json 的结果，和上一轮对比
 ```
 
@@ -52,8 +53,8 @@ claude
 # 激活上下文 checklist
 > /context-handoff-checklist "让 Codex 分析 Restaurant 领域 F1 偏低的原因"
 
-# skill 会强制你填完整的上下文再发送
-# 而不是让 Claude 自己决定发什么
+# skill 会按任务类型补齐代码版本、证据位置和操作边界
+# 发送外部模型前还会确认授权，并裁剪、脱敏材料
 ```
 
 ### Step 4: 修改并同步
@@ -82,16 +83,16 @@ claude
 
 ### Step 9: 下一轮
 
-打开 `DISCOVERY_LOG.md` 的 session 摘要，看上次的"下次优先做"部分，直接接上。
+打开 `.research/state.md`，结合 `.research/events.jsonl` 中最近的事件编号和“下一项验证”继续。项目已有日志规范时，按共享约定映射到现有文件，不并行创建第二套记录。
 
 ## 核心原则
 
-1. **分析阶段一定开 auto-discovery-logger** — 不开就等于没带笔记本进实验室
-2. **跨模型协作一定走 context-handoff-checklist** — 不走就等于给实习生布置任务不说清楚需求
-3. **每轮实验结束看一眼 DISCOVERY_LOG.md** — 它比你的记忆可靠
+1. **长任务和实验分析启用 auto-discovery-logger** — 只记录会影响判断的观察、假设、决定和负面结果
+2. **跨模型协作使用 context-handoff-checklist** — 交付可定位的证据和明确操作边界
+3. **每轮结束检查 `.research/state.md` 和最近事件** — 确保下一步能追溯到运行、配置和原始结果
 
 ## 与上游工具的整合
 
-- 如果用了 auto-review-loop：DISCOVERY_LOG 的关键发现自动进入下一轮 review 的上下文
-- 如果用了 Oh-my-paper：DISCOVERY_LOG 映射到 execution_context.md
-- 如果都没用：DISCOVERY_LOG 自成体系，独立可用
+- 如果用了 auto-review-loop：把已复现或有充分证据的事件编号加入下一轮 review 上下文
+- 如果用了 Oh-my-paper：将 `.research/` 字段映射到现有 `execution_context.md` 等状态文件
+- 如果都没用：使用 `.research/events.jsonl`、`.research/state.md` 和运行清单形成最小可追溯闭环
