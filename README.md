@@ -17,10 +17,10 @@ bash install.sh
 
 | Skill | 做什么 | 命令 |
 |---|---|---|
-| [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 整理代码版本、工作区状态、证据位置和操作边界，生成可继续执行的交接包 | `/context-handoff-checklist` |
-| [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 记录观察、假设、决定和负面结果，保留前后因果 | `/auto-discovery-logger` |
+| [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 用于跨会窗口/agent的上下文交接。 | `/context-handoff-checklist` |
+| [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 自动记录工作中的一些观察、假设、决定和负面结果，保留一定的前后因果 | `/auto-discovery-logger` |
 | [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 在固定数据划分和硬预算内自动生成、运行、比较超参数 trial，支持 `plan`、`tune`、`resume` 和 `report` | `/ai4ai-model-optimizer` |
-| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 独立复算数据、指标和基线，再让不同模型补充审查与分歧分析 | `/cross-model-verifier` |
+| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 多模型交叉审核 | `/cross-model-verifier` |
 
 手工复制其中一个时，把 `skills/custom/_shared/` 一起复制。否则相对引用会断。
 
@@ -38,16 +38,8 @@ bash install.sh
 | [monitor-experiment](skills/upstream/monitor-experiment/SKILL.md) | 通过 SSH、screen 和结果文件检查实验进度 | ARIS |
 | [collaborating-with-codex](skills/upstream/collaborating-with-codex/SKILL.md) | 把编码、调试和代码审查交给 Codex CLI，支持多轮会话 | GuDaStudio |
 
-这里只同步了上表内容。ARIS 的其他 skill、`tools/`、`templates/`、`render-html` 和 `manual-review` MCP 没有收进来，相关可选流程需要按上游说明另装。固定 commit、源路径、同步范围和许可证都记在 [UPSTREAM_SOURCES.json](skills/upstream/UPSTREAM_SOURCES.json)。`skills/upstream/` 不做本地改写；自定义内容放在 `skills/custom/`。
+这里只同步了上表内容。相关可选流程需要按上游说明另装。
 
-### 使用前先看
-
-安装脚本不会运行这些 skill。风险出现在调用之后。
-
-- `auto-review-loop` 的 `nightmare` 模式暂时别用。当前上游把 reviewer 文本插进 shell heredoc，恶意分隔符可能变成命令注入；嵌套的 `codex exec` 也没有强制只读。
-- `research-lit` 会优先执行项目内 `.aris/tools/` 或 `tools/` 下的 helper，还会把外部论文内容交给 Agent。只在可信项目里运行。
-- `auto-review-loop`、`idea-discovery` 和部分共享流程会改代码、连 SSH、跑 GPU，也可能清理 scratch、日志和 summary。第一次远程或付费执行前打开人工确认，并先把工作区留在可恢复状态。`idea-discovery` 当前默认预算最高为 8 GPU-hours。
-- review trace 可能保存完整 prompt 和 response。敏感项目用 `meta` 或 `off`，并确保 trace 目录不会进 Git。
 
 ## 工作流
 
