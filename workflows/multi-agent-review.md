@@ -53,7 +53,7 @@ GPT 的 review 会涵盖：逻辑漏洞、缺失实验、叙事弱点、投稿�
 使用 GuDaStudio 的 collaborating-with-codex：
 
 ```bash
-python codex_bridge.py \
+python "$HOME/.claude/skills/collaborating-with-codex/scripts/codex_bridge.py" \
   --cd "/path/to/project" \
   --PROMPT "Review the evaluation code in eval.py. Check: (1) metric computation correctness, (2) data leakage risks, (3) reproducibility issues. Report each as CHECKED, CONTRADICTED, or UNRESOLVED, with evidence."
 ```

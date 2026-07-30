@@ -35,10 +35,11 @@ claude mcp add codex -s user -- codex mcp-server
 
 **推荐：GuDaStudio/skills（collaborating-with-codex）**
 
-理由：最简单的 Claude↔Codex 协作方案。安装后 Claude 自动在编码时征询 Codex 意见。read-only 沙箱保证安全。
+理由：最简单的 Claude↔Codex 协作方案。默认 read-only sandbox 能降低误修改风险；是否调用外部模型仍应服从项目授权和敏感材料边界。
 
 ```bash
-./install.sh --user --skill collaborating-with-codex
+# 本仓库已经收录该 skill；在仓库根目录安装全部已收录 skill
+bash install.sh
 ```
 
 **局限**：只做代码层面的协作，不涉及论文写作或实验管理。
@@ -151,4 +152,3 @@ report_without_new_trials()
 | 安全约束 | 轮次/计算/行为 多层限制 | 角色 memory 隔离 | 默认 read-only 沙箱 |
 | 可扩展性 | 增加 skill = 加一个目录 | plugin 系统 + skill catalog | 加 submodule |
 | 外部依赖 | Codex MCP | Node.js (hooks), 可选 Codex | Python 3.8+, Codex CLI |
-| 社区规模 | 较小 (33★) | 中等 (197★) | 较大 (1.9k★) |

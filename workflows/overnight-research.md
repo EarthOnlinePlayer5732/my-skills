@@ -4,6 +4,8 @@
 
 结合 Auto-review-loop 和 Oh-my-paper 的能力，搭建一个"睡前启动、醒来看结果"的自动化研究流程。
 
+无人值守不等于跳过授权。只在隔离、可恢复且不含生产凭据的环境中使用；远程执行、付费调用、依赖安装和长时间实验必须预先限定具体范围与预算。
+
 ## 前置条件
 
 1. Claude Code 已安装
@@ -13,30 +15,15 @@
 
 ## 配置步骤
 
-### 1. 权限自动放行
+### 1. 按项目配置权限
 
-将以下内容写入项目目录的 `.claude/settings.local.json`：
+从 [保守权限示例](../configs/permissions.example.json) 开始，将需要的规则合并到项目 `.claude/settings.local.json`。不要直接覆盖已有设置。
 
-```json
-{
-  "permissions": {
-    "allow": [
-      "mcp__codex__codex",
-      "mcp__codex__codex-reply",
-      "Write",
-      "Edit",
-      "Bash(ssh *)",
-      "Bash(scp *)",
-      "Bash(screen *)",
-      "Bash(cat *)",
-      "Bash(grep *)",
-      "Bash(python *)"
-    ]
-  }
-}
-```
-
-→ 完整配置见 [configs/permissions.json](../configs/permissions.json)
+- 保持默认 permission mode；用 `/permissions` 检查最终生效规则。
+- 只对已经核验的具体 host、脚本和命令前缀授权。
+- 不要通配放行 SSH、文件传输、Python、包管理器、外部模型或 `git push`。
+- 对 `.env`、secrets 和 credentials 保留显式 deny；敏感材料还应使用 sandbox 或系统级隔离。
+- 如果流程无法在这些边界内运行，改为有人值守，不要扩大成全工具免确认。
 
 ### 2. 启动命令
 
@@ -69,9 +56,9 @@ ssh gpu-server "screen -ls"
 | 风险 | 缓解措施 |
 |------|---------|
 | 无限循环 | MAX_ROUNDS = 4，硬上限 |
-| GPU 浪费 | >4h 实验自动跳过 |
+| GPU 浪费 | 启动前写明总预算、单实验 timeout 和停止策略；当前 review skill 不提供固定 4h 硬闸门 |
 | 论文被改坏 | Git 版本控制，每轮有完整 diff 记录 |
-| API 费用失控 | 4 轮 × 2 次 MCP 调用 = 最多 8 次 GPT 调用 |
+| API 费用失控 | 明确最大轮数、每轮允许的外部调用和费用上限；以实际调用账本为准 |
 | 网络中断 | REVIEW_STATE.json 支持断点恢复 |
 
 ## 实际耗时估算

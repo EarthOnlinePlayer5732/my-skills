@@ -4,6 +4,13 @@
 
 将 Oh-my-paper 的 5 阶段 pipeline 与 Auto-review-loop 的审稿循环和 GuDaStudio 的多模型协作整合为一个完整的研究工作流。
 
+## 前置条件
+
+- 先运行本仓库的 `bash install.sh`。
+- `/omp:*` 命令来自未收录的 Oh-my-paper 插件，必须按其上游文档独立安装；不使用 OMP 时需替换对应阶段。
+- `/idea-discovery` 依赖本仓库未收录的 `/idea-creator`、`/novelty-check` 和 research-refine 系列 skill，只有补齐上游依赖后才能作为完整替代路径。
+- 外部模型调用、论文材料发送和 Codex MCP/CLI 使用都需要项目授权与脱敏边界。
+
 ## 整体流程
 
 ```
@@ -79,8 +86,8 @@ Week 1              Week 2-3              Week 4              Week 5
 /omp:review                         # Reviewer 角色做终审
 # → 产出：review_log.md
 
-# Codex 代码审查
-python codex_bridge.py --cd "." --PROMPT "Final review: check all citations exist, figures match text, code matches claims"
+# Codex 代码审查；路径对应 install.sh 的用户级安装位置
+python "$HOME/.claude/skills/collaborating-with-codex/scripts/codex_bridge.py" --cd "." --PROMPT "Final review: check all citations exist, figures match text, code matches claims"
 ```
 
 ## 工具间的数据流
