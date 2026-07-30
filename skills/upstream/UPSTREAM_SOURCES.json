@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "synced_at": "2026-07-30",
+  "sources": [
+    {
+      "repository": "https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep",
+      "ref": "53562a7c64cc1d55946cba1fb8a8416137143d14",
+      "variant": "skills/<name> (Claude Code default)",
+      "license": "AUTO_CLAUDE_CODE_RESEARCH_IN_SLEEP_LICENSE",
+      "vendored_scope": "selected skills plus skills/shared-references",
+      "not_vendored": [
+        "other skills",
+        "tools",
+        "templates",
+        "mcp-servers/manual-review"
+      ],
+      "support_mapping": {
+        "skills/shared-references": "shared-references"
+      },
+      "mappings": {
+        "skills/auto-review-loop": "auto-review-loop",
+        "skills/research-review": "research-review",
+        "skills/research-lit": "research-lit",
+        "skills/idea-discovery": "idea-discovery",
+        "skills/analyze-results": "analyze-results",
+        "skills/monitor-experiment": "monitor-experiment"
+      }
+    },
+    {
+      "repository": "https://github.com/GuDaStudio/skills",
+      "ref": "d0e8b1d4bed2f1aaf77185aece1f17b78933feb2",
+      "source_path": "collaborating-with-codex",
+      "submodule_repository": "https://github.com/GuDaStudio/collaborating-with-codex",
+      "submodule_ref": "8772527fcc2bf68706749b4f12014662e9ee582c",
+      "local_path": "collaborating-with-codex",
+      "license": "collaborating-with-codex/LICENSE"
+    }
+  ]
+}

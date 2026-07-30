@@ -6,14 +6,9 @@
 
 ```bash
 bash install.sh
-
-# 可选：配置用户级 Codex MCP，对所有 Claude Code 项目生效
-bash configs/mcp-setup.sh
 ```
 
-安装器只复制本仓库已经收录的 skill，不会安装 OMP 等外部插件，也不会自动安装或升级 Codex CLI。需要项目级 MCP 时，请在目标项目目录按 Claude Code 官方说明手工使用 `--scope local`；本仓库脚本只在尚无同名配置时添加用户级 Codex MCP。
-
-[CLAUDE.example.md](configs/CLAUDE.example.md) 是可选的项目指令模板，[permissions.example.json](configs/permissions.example.json) 是保守权限示例。按需合并到目标项目；不要覆盖已有 `CLAUDE.md` 或 `.claude/settings.local.json`，也不要把远程执行、依赖安装或外部模型调用设为无条件放行。
+安装器只复制本仓库已经收录的 skill 及其共享支持文件，不会安装 OMP 等外部插件，也不会安装或升级 Claude Code、Codex CLI 或其他全局依赖。
 
 ## Skill 列表
 
@@ -32,7 +27,7 @@ bash configs/mcp-setup.sh
 
 ### 上游 skill（精选）
 
-从社区项目中挑选的实用 skill。`install.sh` 会复制这些目录，但部分复杂 pipeline 仍需要未收录的上游配套 skill：
+从社区项目中挑选的实用 skill。`install.sh` 会复制这些 skill 和它们直接引用的 `shared-references`。这里不是完整的 ARIS 发行包；依赖其他上游 skill、`tools/`、`templates/`、`render-html` 或 `manual-review` MCP 的可选能力，仍需按上游项目安装：
 
 | Skill | 来源 | 功能 |
 |-------|------|------|
@@ -43,6 +38,8 @@ bash configs/mcp-setup.sh
 | [analyze-results](skills/upstream/analyze-results/SKILL.md) | 同上 | 实验结果分析 |
 | [monitor-experiment](skills/upstream/monitor-experiment/SKILL.md) | 同上 | 实验监控 |
 | [collaborating-with-codex](skills/upstream/collaborating-with-codex/SKILL.md) | [GuDaStudio/skills](https://github.com/GuDaStudio/skills) | Claude↔Codex 多模型协作 |
+
+上游仓库、固定 commit、源路径、同步范围和许可证见 [UPSTREAM_SOURCES.json](skills/upstream/UPSTREAM_SOURCES.json)。`skills/upstream/` 保持上游快照；本仓库自定义语义只放在 `skills/custom/`。
 
 其他推荐但未收录的项目：
 - [Oh-my--paper](https://github.com/LigphiDonk/Oh-my--paper) — 完整科研 pipeline 插件（5 Agent 角色 + 34 skill），适合通过 plugin 方式安装

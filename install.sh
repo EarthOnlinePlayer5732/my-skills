@@ -22,9 +22,17 @@ copy_skill_dir() {
 
 echo -e "${GREEN}=== Installing AI Research Toolkit Skills ===${NC}"
 
+# 安装上游 skill 共用的支持文件
+upstream_shared_dir="$SCRIPT_DIR/skills/upstream/shared-references"
+if [[ -d "$upstream_shared_dir" ]]; then
+    copy_skill_dir "$upstream_shared_dir" "shared-references"
+    echo -e "${GREEN}✓${NC} shared-references (upstream support)"
+fi
+
 # 安装上游 skill
 for skill in "$SCRIPT_DIR"/skills/upstream/*/; do
     name=$(basename "$skill")
+    [[ "$name" == "shared-references" ]] && continue
     copy_skill_dir "$skill" "$name"
     echo -e "${GREEN}✓${NC} $name (upstream)"
 done
@@ -48,6 +56,5 @@ echo ""
 echo -e "${GREEN}=== Done! ${NC}Installed to $SKILL_DIR"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
-echo "  1. Optional Codex MCP: bash \"$SCRIPT_DIR/configs/mcp-setup.sh\""
-echo "  2. Start Claude Code in your project directory"
-echo "  3. Try: /context-handoff-checklist 'handoff this task'"
+echo "  1. Start Claude Code in your project directory"
+echo "  2. Try: /context-handoff-checklist 'handoff this task'"

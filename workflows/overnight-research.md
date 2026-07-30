@@ -17,7 +17,7 @@
 
 ### 1. 按项目配置权限
 
-从 [保守权限示例](../configs/permissions.example.json) 开始，将需要的规则合并到项目 `.claude/settings.local.json`。不要直接覆盖已有设置。
+按照 [Claude Code 权限说明](https://code.claude.com/docs/en/permissions)，将当前项目确实需要的规则写入 `.claude/settings.local.json`。不要直接复制其他项目的设置，也不要覆盖已有规则。
 
 - 保持默认 permission mode；用 `/permissions` 检查最终生效规则。
 - 只对已经核验的具体 host、脚本和命令前缀授权。
