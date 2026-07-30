@@ -7,7 +7,7 @@
 bash install.sh
 ```
 
-脚本只把仓库里的 skill 和共享文件复制到 `~/.claude/skills`。它不会安装或升级 Claude Code、Codex CLI、OMP、MCP server，也不会改全局配置。
+脚本只会吧仓库里的 skill 和共享文件复制到 `~/.claude/skills`。
 
 ## Skill
 
