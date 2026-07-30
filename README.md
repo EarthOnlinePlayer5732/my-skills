@@ -41,6 +41,15 @@ bash install.sh
 
 上游仓库、固定 commit、源路径、同步范围和许可证见 [UPSTREAM_SOURCES.json](skills/upstream/UPSTREAM_SOURCES.json)。`skills/upstream/` 保持上游快照；本仓库自定义语义只放在 `skills/custom/`。
 
+#### 已知运行时风险
+
+`install.sh` 只复制文件，不会触发以下行为。调用上游 skill 前仍需注意：
+
+- 暂不要使用 `auto-review-loop` 的 `nightmare` 模式：当前上游会把 reviewer 文本插入 shell heredoc，恶意分隔符可能造成命令注入；其嵌套 `codex exec` 也没有技术上强制只读。
+- `research-lit` 会优先查找并执行项目内 `.aris/tools/` 或 `tools/` helper，并会处理外部论文内容。只在可信项目中运行，不要把抓取内容当作可信指令。
+- `auto-review-loop`、`idea-discovery` 和部分共享流程可以自动改代码、使用 SSH/GPU，或清理 scratch、日志和 summary。首次远程或付费执行前启用人工确认，并保持工作区可恢复；`idea-discovery` 的当前上游默认预算最高可到 8 GPU-hours。
+- review trace 可能保存完整 prompt/response。敏感项目应使用 metadata-only/off，并确保 trace 目录不会提交。
+
 其他推荐但未收录的项目：
 - [Oh-my--paper](https://github.com/LigphiDonk/Oh-my--paper) — 完整科研 pipeline 插件（5 Agent 角色 + 34 skill），适合通过 plugin 方式安装
 - [GuDaStudio/codexmcp](https://github.com/GuDaStudio/codexmcp) — 增强版 Codex MCP server，支持会话持久化
