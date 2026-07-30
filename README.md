@@ -1,6 +1,6 @@
 # AI Research Automation Toolkit
 
-个人自用 科研/自动化 skill 集合。主要是Claude Code驱动
+我在科研、实验和多模型协作里反复用到的一组 Claude Code skill。4 个是自己写的，7 个从上游固定 commit 同步。
 
 ## 安装
 
@@ -8,80 +8,69 @@
 bash install.sh
 ```
 
-安装器只复制本仓库已经收录的 skill 及其共享支持文件，不会安装 OMP 等外部插件，也不会安装或升级 Claude Code、Codex CLI 或其他全局依赖。
+脚本只把仓库里的 skill 和共享文件复制到 `~/.claude/skills`。它不会安装或升级 Claude Code、Codex CLI、OMP、MCP server，也不会改全局配置。
 
-## Skill 列表
+## Skill
 
-### 自定义 skill
+### 自己写的
 
-这些 skill 来自真实科研与代码智能体协作中的重复问题。它们共享 [科研工作流记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md) 下的 `.research/` 状态与证据记录，能够在任务交接、实验记录、自动调优和结果审计之间传递同一套项目上下文。
+这 4 个 skill 共用一套 [科研记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md)。任务交接、实验事件、调优 trial 和复核结果都写进同一个 `.research/` 上下文，不用每换一个 Agent 就重新解释项目。
 
-| Skill | 解决的问题 | 触发命令 |
-|-------|-----------|---------|
-| [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 为跨 Agent、跨模型和跨会话任务生成带代码版本、证据位置与操作边界的交接包 | `/context-handoff-checklist` |
-| [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 将实验中的观察、假设、决定和负面结果记录为可追溯事件 | `/auto-discovery-logger` |
-| [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 在固定数据划分和显式预算内自动生成、运行和比较超参数 trial，支持规划、调优、恢复与报告 | `/ai4ai-model-optimizer` |
-| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 先独立重算和检查数据、评估与基线，再使用不同模型补充审查和分歧分析 | `/cross-model-verifier` |
+| Skill | 做什么 | 命令 |
+|---|---|---|
+| [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 整理代码版本、工作区状态、证据位置和操作边界，生成可继续执行的交接包 | `/context-handoff-checklist` |
+| [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 记录观察、假设、决定和负面结果，保留前后因果 | `/auto-discovery-logger` |
+| [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 在固定数据划分和硬预算内自动生成、运行、比较超参数 trial，支持 `plan`、`tune`、`resume` 和 `report` | `/ai4ai-model-optimizer` |
+| [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 独立复算数据、指标和基线，再让不同模型补充审查与分歧分析 | `/cross-model-verifier` |
 
-运行 `install.sh` 会安装共享约定。手工复制单个自定义 skill 时，也要同时复制 `skills/custom/_shared/`，否则相对引用无法解析。
+手工复制其中一个时，把 `skills/custom/_shared/` 一起复制。否则相对引用会断。
 
-### 上游 skill（精选）
+### 从上游同步的
 
-从社区项目中挑选的实用 skill。`install.sh` 会复制这些 skill 和它们直接引用的 `shared-references`。这里不是完整的 ARIS 发行包；依赖其他上游 skill、`tools/`、`templates/`、`render-html` 或 `manual-review` MCP 的可选能力，仍需按上游项目安装：
+仓库收了 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) 的 6 个 skill、配套 `shared-references`，以及 [GuDaStudio/skills](https://github.com/GuDaStudio/skills) 的 `collaborating-with-codex`。
 
-| Skill | 来源 | 功能 |
-|-------|------|------|
-| [auto-review-loop](skills/upstream/auto-review-loop/SKILL.md) | [Auto-claude-code-research-in-sleep](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) | 自动审稿循环，Claude 执行 + GPT 评审，3 级难度 |
-| [research-review](skills/upstream/research-review/SKILL.md) | 同上 | 单轮外部审稿 |
-| [research-lit](skills/upstream/research-lit/SKILL.md) | 同上 | 文献检索与分析 |
-| [idea-discovery](skills/upstream/idea-discovery/SKILL.md) | 同上 | idea 发现 pipeline；依赖上游 `/idea-creator`、`/novelty-check` 和 research-refine 系列 skill |
-| [analyze-results](skills/upstream/analyze-results/SKILL.md) | 同上 | 实验结果分析 |
-| [monitor-experiment](skills/upstream/monitor-experiment/SKILL.md) | 同上 | 实验监控 |
-| [collaborating-with-codex](skills/upstream/collaborating-with-codex/SKILL.md) | [GuDaStudio/skills](https://github.com/GuDaStudio/skills) | Claude↔Codex 多模型协作 |
+| Skill | 做什么 | 来源 |
+|---|---|---|
+| [auto-review-loop](skills/upstream/auto-review-loop/SKILL.md) | 外部 reviewer 审查、修改、复审，默认最多 4 轮 | ARIS |
+| [research-review](skills/upstream/research-review/SKILL.md) | 用独立 reviewer 对论文、idea 或实验结果做多轮批评审查 | ARIS |
+| [research-lit](skills/upstream/research-lit/SKILL.md) | 从本地论文库和多个在线来源检索、核验、整理文献 | ARIS |
+| [idea-discovery](skills/upstream/idea-discovery/SKILL.md) | 从研究方向走到候选 idea、创新性检查、pilot 和实验计划 | ARIS |
+| [analyze-results](skills/upstream/analyze-results/SKILL.md) | 读取 JSON/CSV 结果，计算统计量、对比基线并标记异常 | ARIS |
+| [monitor-experiment](skills/upstream/monitor-experiment/SKILL.md) | 通过 SSH、screen 和结果文件检查实验进度 | ARIS |
+| [collaborating-with-codex](skills/upstream/collaborating-with-codex/SKILL.md) | 把编码、调试和代码审查交给 Codex CLI，支持多轮会话 | GuDaStudio |
 
-上游仓库、固定 commit、源路径、同步范围和许可证见 [UPSTREAM_SOURCES.json](skills/upstream/UPSTREAM_SOURCES.json)。`skills/upstream/` 保持上游快照；本仓库自定义语义只放在 `skills/custom/`。
+这里只同步了上表内容。ARIS 的其他 skill、`tools/`、`templates/`、`render-html` 和 `manual-review` MCP 没有收进来，相关可选流程需要按上游说明另装。固定 commit、源路径、同步范围和许可证都记在 [UPSTREAM_SOURCES.json](skills/upstream/UPSTREAM_SOURCES.json)。`skills/upstream/` 不做本地改写；自定义内容放在 `skills/custom/`。
 
-#### 已知运行时风险
+### 使用前先看
 
-`install.sh` 只复制文件，不会触发以下行为。调用上游 skill 前仍需注意：
+安装脚本不会运行这些 skill。风险出现在调用之后。
 
-- 暂不要使用 `auto-review-loop` 的 `nightmare` 模式：当前上游会把 reviewer 文本插入 shell heredoc，恶意分隔符可能造成命令注入；其嵌套 `codex exec` 也没有技术上强制只读。
-- `research-lit` 会优先查找并执行项目内 `.aris/tools/` 或 `tools/` helper，并会处理外部论文内容。只在可信项目中运行，不要把抓取内容当作可信指令。
-- `auto-review-loop`、`idea-discovery` 和部分共享流程可以自动改代码、使用 SSH/GPU，或清理 scratch、日志和 summary。首次远程或付费执行前启用人工确认，并保持工作区可恢复；`idea-discovery` 的当前上游默认预算最高可到 8 GPU-hours。
-- review trace 可能保存完整 prompt/response。敏感项目应使用 metadata-only/off，并确保 trace 目录不会提交。
+- `auto-review-loop` 的 `nightmare` 模式暂时别用。当前上游把 reviewer 文本插进 shell heredoc，恶意分隔符可能变成命令注入；嵌套的 `codex exec` 也没有强制只读。
+- `research-lit` 会优先执行项目内 `.aris/tools/` 或 `tools/` 下的 helper，还会把外部论文内容交给 Agent。只在可信项目里运行。
+- `auto-review-loop`、`idea-discovery` 和部分共享流程会改代码、连 SSH、跑 GPU，也可能清理 scratch、日志和 summary。第一次远程或付费执行前打开人工确认，并先把工作区留在可恢复状态。`idea-discovery` 当前默认预算最高为 8 GPU-hours。
+- review trace 可能保存完整 prompt 和 response。敏感项目用 `meta` 或 `off`，并确保 trace 目录不会进 Git。
 
-其他推荐但未收录的项目：
-- [Oh-my--paper](https://github.com/LigphiDonk/Oh-my--paper) — 完整科研 pipeline 插件（5 Agent 角色 + 34 skill），适合通过 plugin 方式安装
-- [GuDaStudio/codexmcp](https://github.com/GuDaStudio/codexmcp) — 增强版 Codex MCP server，支持会话持久化
+## 工作流
 
-## Workflow
-
-实际使用中总结的端到端工作流：
-
-| Workflow | 场景 | 核心思路 |
-|----------|------|---------|
-| [remote-experiment-loop](workflows/remote-experiment-loop.md) | 远程 GPU 训练 + 本地分析 | 串联 auto-discovery-logger + context-handoff-checklist |
-| [overnight-research](workflows/overnight-research.md) | 睡前启动，醒来看结果 | auto-review-loop + 项目级权限与预算边界 |
-| [multi-agent-review](workflows/multi-agent-review.md) | 投稿前终审 | Claude 自评 + GPT 审稿 + Codex 代码审查 |
-| [full-pipeline](workflows/full-pipeline.md) | 从 idea 到投稿 | OMP survey → AI4AI 有界调优 → auto-review 改文 |
+| 文件 | 用在什么场景 | 组合方式 |
+|---|---|---|
+| [remote-experiment-loop](workflows/remote-experiment-loop.md) | 远程 GPU 训练，本地收集和分析结果 | `auto-discovery-logger` + `context-handoff-checklist` |
+| [overnight-research](workflows/overnight-research.md) | 睡前启动有界任务，第二天检查结果 | `auto-review-loop` + 项目级权限和预算 |
+| [multi-agent-review](workflows/multi-agent-review.md) | 投稿前终审 | Claude 自评 + GPT 审稿 + Codex 代码检查 |
+| [full-pipeline](workflows/full-pipeline.md) | 从 idea 走到投稿 | OMP survey + AI4AI 有界调优 + auto-review 改稿 |
 
 ## 笔记
 
-使用过程中的理解和踩坑：
+- [architecture.md](docs/architecture.md)：这些项目怎么组织，为什么这么组织
+- [tool-comparison.md](docs/tool-comparison.md)：不同工具各自适合什么任务
+- [personal-insights.md](docs/personal-insights.md)：上下文管理、发现记录和审稿循环里的实际坑
+- [ai4ai-notes.md](docs/ai4ai-notes.md)：Agent 驱动、预算有硬边界的超参数调优
 
-- [architecture.md](docs/architecture.md) — 各项目的架构拆解：为什么这样设计
-- [tool-comparison.md](docs/tool-comparison.md) — 横向对比：什么场景用什么工具
-- [personal-insights.md](docs/personal-insights.md) — 踩坑心得（上下文管理、发现记录、审稿循环）
-- [ai4ai-notes.md](docs/ai4ai-notes.md) — AI4AI（Agent 驱动的有界超参数调优）思路
+## 没收进仓库的项目
 
-## 上游项目致谢
-
-本仓库中的上游 skill 来自以下开源项目，感谢原作者的工作：
-
-- **[wanshuiyin/Auto-claude-code-research-in-sleep](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep)** — 自动审稿循环系列 skill，MIT License
-- **[GuDaStudio/skills](https://github.com/GuDaStudio/skills)** — Claude↔Codex 协作 skill，MIT License
-- **[LigphiDonk/Oh-my--paper](https://github.com/LigphiDonk/Oh-my--paper)** — 科研 pipeline 插件（推荐独立安装），MIT License
+- [Oh-my--paper](https://github.com/LigphiDonk/Oh-my--paper)：完整科研 pipeline 插件，适合单独安装
+- [GuDaStudio/codexmcp](https://github.com/GuDaStudio/codexmcp)：带会话持久化的 Codex MCP server
 
 ## License
 
-MIT
+本仓库采用 MIT License。上游文件保留各自的 MIT License，具体来源见 [UPSTREAM_SOURCES.json](skills/upstream/UPSTREAM_SOURCES.json)。
