@@ -90,6 +90,9 @@ source_paths:
   "event_id": "E-YYYYMMDD-HHMMSS-001",
   "timestamp": "ISO-8601",
   "session_topic": "...",
+  "tuning_id": "...",
+  "config_id": "...",
+  "trial_id": "...",
   "run_id": "...",
   "category": "anomaly|positive|negative|null_result|data_issue|implementation_issue|hypothesis|decision|correction",
   "status": "observed|reproduced|supported|contradicted|resolved|unknown",
@@ -126,7 +129,7 @@ source_paths:
 
 记录前检查最近事件：
 
-- 同一运行、同一现象、同一证据没有新增信息时，不重复写入；
+- 同一 tuning/config/trial/run、同一现象、同一证据没有新增信息时，不重复写入；
 - 新证据复现旧事件时，新增事件并引用旧 `event_id`；
 - 发现旧记录错误时，新增 `correction` 事件，通过 `supersedes` 指向旧记录；
 - 不静默修改历史事件。

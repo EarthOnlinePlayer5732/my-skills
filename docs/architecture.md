@@ -240,18 +240,20 @@ GuDaStudio 的核心协作哲学是 4 步强制流程：
 
 ---
 
-## 4. AI4AI（证据驱动的模型实验诊断）
+## 4. AI4AI（Agent 驱动的有界超参数调优）
 
 ### 4.1 核心思路
 
-区别于前三个项目（优化论文），AI4AI 的目标是从日志、结果和错误分析中诊断模型瓶颈，并设计能区分候选解释的实验。仓库中的 v2 skill 默认 `plan-only`；只有用户确认目标、数据划分、预算、允许修改范围和停止条件后才进入 `execute`：
+区别于前三个项目（优化论文），AI4AI 的目标是在训练和验证流程稳定后，让 Agent 在冻结的搜索空间和硬预算内充当搜索控制器。它支持 `plan / tune / resume / report` 四种模式：
 
 ```
-模型 v0 → 检查基线与评估有效性 → 诊断候选原因 → 设计可证伪实验
-                                                    │
-                       用户授权 execute ────────────┘
-                                                    ↓
-                         单一主要改动 → 训练/评估 → 结果卡
+plan：核验基线 → 冻结目标、空间、预算与停止规则
+                         ↓
+tune：coarse 搜索 → 自适应 refine → top-k 多 seed confirm
+                         ↓
+report：最佳配置 + trial 历史 + 预算 + 失败区域
+                         ↑
+resume：核对版本、数据、评价、规格与剩余预算后续跑
 ```
 
 灵感来源：
@@ -264,9 +266,9 @@ GuDaStudio 的核心协作哲学是 4 步强制流程：
 | 维度 | Auto-review-loop | AI4AI |
 |------|-----------------|-------|
 | 优化目标 | 论文质量（分数） | 模型性能（指标） |
-| 循环内容 | 审稿→改文→再审 | 检查→诊断→实验设计；授权后执行 |
-| 评审者 | 外部 LLM | 原始证据与实验指标；外部模型只作建议 |
-| 终止条件 | 分数阈值 or 轮次上限 | 用户定义目标、预算或判别信息耗尽 |
+| 循环内容 | 审稿→改文→再审 | 选参→训练→验证→记账→细化搜索 |
+| 控制信号 | 外部 LLM 评分 | 固定验证指标、约束指标和预算账本 |
+| 终止条件 | 分数阈值 or 轮次上限 | trial/时间/算力/费用、目标指标、patience 或空间耗尽 |
 
 ---
 
@@ -289,6 +291,7 @@ GuDaStudio 的核心协作哲学是 4 步强制流程：
 | Auto-review-loop | REVIEW_STATE.json + AUTO_REVIEW.md | 检测 JSON → 判断是否超时 → 恢复轮次和 threadId |
 | Oh-my-paper | .pipeline/memory/*.md + tasks.json | SessionStart hook 自动注入 |
 | GuDaStudio | SESSION_ID（Codex 侧） | 传入 SESSION_ID 继续对话 |
+| AI4AI | `.research/tuning/<id>/` + trial 账本 | 核对 commit、split、evaluator、spec/sampler state、active attempt 和预算预留后恢复 |
 
 ### 安全与可控性
 
@@ -297,3 +300,4 @@ GuDaStudio 的核心协作哲学是 4 步强制流程：
 | Auto-review-loop | 轮次上限、计算预算、禁止隐藏弱点、引用验证链 |
 | Oh-my-paper | 角色隔离、Hook 自动同步、任务状态机 |
 | GuDaStudio | 默认 read-only 沙箱、Codex 输出仅作参考 |
+| AI4AI | 显式调用、冻结搜索空间、启动前预算预留、全局/单 trial 硬上限、测试集事后单独授权、失败 trial 保留 |

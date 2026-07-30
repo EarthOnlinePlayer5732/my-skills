@@ -1,4 +1,4 @@
-# AI4AI 实践笔记：证据驱动的模型实验迭代
+# AI4AI 实践笔记：Agent 驱动的有界超参数调优
 
 ## 概念溯源
 
@@ -20,43 +20,48 @@ Stanford Agentic Reviewer 按 ICLR 标准评审后发现，FARS 生成论文的�
 
 ### 核心思想提炼
 
-AI4AI 的研究设想是把 Agent 的关注点从“论文分数”转向模型指标与实验判断。仓库中的 v2 skill 采用更保守的落地方式：默认只做证据诊断和实验规划，不把“持续提升指标”当作保证。
+AI4AI 的核心是把 Agent 从“给调参建议”提升为有状态的搜索控制器：在固定数据划分、评价流程、搜索空间和硬预算内，自动生成候选配置、运行训练与验证、维护 trial 账本并细化搜索区域。
 
 Auto-review-loop 的循环是：
 ```
 审稿 → 改文 → 再审（目标：reviewer score ≥ 6）
 ```
 
-获得明确执行授权后的受控迭代是：
+有界超参数调优循环是：
 ```
-核验基线与评估 → 提出可证伪假设 → 单一主要改动 → 再训练/重评
+plan → tune(coarse → refine → confirm) → report
+          ↑                         │
+          └──── trial 历史与预算 ────┘
 ```
+
+`plan` 不运行实验；`tune` 只执行用户确认的规格；`resume` 核对版本和账本后续跑；`report` 只汇总，不产生新 trial。
 
 ## 与现有工具的结合思路
 
 ### 方案一：复用 Auto-review-loop 框架
 
-修改 auto-review-loop 的几个关键点：
-1. Phase A 的 prompt 从"审论文"改为"分析实验结果，找到性能瓶颈"
-2. Phase C 的 fix 从"改论文"改为"改代码/超参"
-3. Phase D 的等待从"等 reviewer 回复"改为"等训练完成"
-4. 终止条件从 score ≥ 6 改为 metric delta < ε 或 budget 耗尽
+可复用 auto-review-loop 的持久化思想，但不能直接照搬论文审稿状态：
+1. 用冻结的 `tuning_spec.yaml` 代替主观 reviewer prompt；
+2. 用追加式 `trials.jsonl` 记录所有成功、失败和无效配置；
+3. 用 `state.json` 保存可恢复阶段、sampler 状态、active attempt、预算预留和当前派生结果；
+4. 新 trial 先按最坏情况预留名额与资源，再用最大 trial、全局/单 trial 时间、算力、费用、目标指标和 patience 等机械条件停止。
 
 ### 方案二：结合 OMP pipeline
 
-在 OMP 的 Experiment 阶段插入 AI4AI 诊断与受控迭代：
+在 OMP 的 Experiment 阶段插入 AI4AI 有界调优：
 ```
-Survey → Ideation → [AI4AI: plan-only → 授权后 execute] → Publication
+Survey → Ideation → [AI4AI: plan → tune → report] → Audit → Publication
 ```
 
-这样可以利用 OMP 的前期调研和后期写作能力，同时保留中间实验方向、预算和停止条件的人类决策点。
+这样可以利用 OMP 的前期调研和后期写作能力，同时让 Agent 接管重复选参；人类仍负责批准搜索空间、预算、修改边界和最终测试集使用。
 
 ## 实际约束与风险
 
-1. **计算预算**：无限制循环可能烧光 GPU 时间。必须设置硬上限。
-2. **搜索空间**：Agent 可能在超参空间里随机游走而非系统搜索。需要引导策略（如 Bayesian optimization 提示）。
-3. **过拟合风险**：Agent 可能找到"刷 benchmark 的 trick"而非真正的改进。需要多个 evaluation metric 交叉验证。
-4. **代码正确性**：Agent 修改的代码可能有 bug，训练看似正常但结果无效。需要 sanity check 机制。
+1. **计算预算**：无限制循环可能烧光 GPU 时间。必须设置全局与单 trial 硬上限，并在启动前完成预算接纳与预留。
+2. **搜索漂移**：Agent 只能在已批准空间内生成候选；扩大范围必须重新确认规格。
+3. **验证集过拟合**：探索使用较少 seed，top-k 再做多 seed 确认；最终测试集只能在冻结配置后另行授权一次，授权不改写 tuning spec。
+4. **恢复错配**：`resume` 必须核对 commit、数据划分、评价脚本、规格 hash、sampler state、active attempt 和预算账本。
+5. **代码正确性**：默认只修改配置副本和 CLI 参数，运行前仍需 sanity check。
 
 ## 可落地的最小实现
 

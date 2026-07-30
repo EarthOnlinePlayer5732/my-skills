@@ -43,11 +43,11 @@ claude mcp add codex -s user -- codex mcp-server
 
 **局限**：只做代码层面的协作，不涉及论文写作或实验管理。
 
-### 场景四：想诊断模型瓶颈并规划受控迭代
+### 场景四：想在硬预算内自动搜索超参数
 
 **推荐：AI4AI 思路 + 自定义 skill**
 
-理由：自定义 skill 默认从日志和错误分析中诊断瓶颈，先给出可证伪实验；只有明确授权并设定预算、数据划分和停止条件后才执行迭代。
+理由：自定义 skill 支持 `plan / tune / resume / report`，能在固定验证指标、显式搜索空间和预算内自动运行 trial，并保留完整状态、失败记录和最佳配置来源。
 
 → 参见 [skills/custom/ai4ai-model-optimizer](../skills/custom/ai4ai-model-optimizer/SKILL.md)
 
@@ -121,20 +121,23 @@ Claude (执行者) ←──── MCP/CLI ────→ GPT/Codex (评审者/
 **优点**：真正的并行视角，消除自我评估偏差。
 **缺点**：通信开销，需要管理对话状态（threadId/SESSION_ID）。
 
-### 模式三：受控实验循环（AI4AI / autoresearch）
+### 模式三：有状态的超参数搜索（AI4AI / autoresearch）
 
-单个 Agent 或 Agent 系统可以运行实验循环，但仓库中的 AI4AI v2 默认只规划；进入执行前需要用户确认预算、数据划分、修改范围和停止条件。
+Agent 只在用户确认的 tuning spec 内运行，并把每个候选、指标、失败和预算写入持久化账本。
 
 ```
-while not converged and within_budget:
-    analyze(current_results)
-    propose(modifications)
-    implement(changes)
-    train_and_evaluate()
+plan_and_freeze_spec()
+for phase in [coarse, refine, confirm]:
+    while phase_has_work and can_reserve_within_hard_budget:
+        candidate = propose_within_search_space(trial_history, sampler_state)
+        reserve_budget_and_persist_queued(candidate)
+        run_train_and_validation_with_trial_limits(candidate)
+        append_trial_release_reservation_and_update_state()
+report_without_new_trials()
 ```
 
-**优点**：获得授权后可以自动化重复的诊断、单因素实验和结果记录。
-**缺点**：仍需要可靠的有效性检查和预算约束，否则可能浪费计算资源或对最终测试集过拟合。
+**优点**：减少人工逐轮选参，支持中断恢复，并能审计最佳配置来自哪些 trial。
+**缺点**：恢复时容易出现版本或预算错配；如果空间、验证集和停止规则设计不好，仍可能浪费算力或对验证集过拟合。
 
 ---
 

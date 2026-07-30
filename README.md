@@ -6,13 +6,13 @@
 
 ### 自定义 skill
 
-这些 skill 来自真实科研与代码智能体协作中的重复问题。它们共享 [科研工作流记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md) 下的 `.research/` 状态与证据记录，能够在任务交接、实验记录、迭代规划和结果审计之间传递同一套项目上下文。
+这些 skill 来自真实科研与代码智能体协作中的重复问题。它们共享 [科研工作流记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md) 下的 `.research/` 状态与证据记录，能够在任务交接、实验记录、自动调优和结果审计之间传递同一套项目上下文。
 
 | Skill | 解决的问题 | 触发命令 |
 |-------|-----------|---------|
 | [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 为跨 Agent、跨模型和跨会话任务生成带代码版本、证据位置与操作边界的交接包 | `/context-handoff-checklist` |
 | [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 将实验中的观察、假设、决定和负面结果记录为可追溯事件 | `/auto-discovery-logger` |
-| [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 基于实验日志诊断瓶颈并规划下一轮验证；只有明确授权后才修改代码或运行实验 | `/ai4ai-model-optimizer` |
+| [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 在固定数据划分和显式预算内自动生成、运行和比较超参数 trial，支持规划、调优、恢复与报告 | `/ai4ai-model-optimizer` |
 | [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 先独立重算和检查数据、评估与基线，再使用不同模型补充审查和分歧分析 | `/cross-model-verifier` |
 
 运行 `install.sh` 会安装共享约定。手工复制单个自定义 skill 时，也要同时复制 `skills/custom/_shared/`，否则相对引用无法解析。v2 的行为与产物迁移见 [UPGRADE_NOTES.md](UPGRADE_NOTES.md)。
@@ -44,7 +44,7 @@
 | [remote-experiment-loop](workflows/remote-experiment-loop.md) | 远程 GPU 训练 + 本地分析 | 串联 auto-discovery-logger + context-handoff-checklist |
 | [overnight-research](workflows/overnight-research.md) | 睡前启动，醒来看结果 | auto-review-loop + 自动放行配置 |
 | [multi-agent-review](workflows/multi-agent-review.md) | 投稿前终审 | Claude 自评 + GPT 审稿 + Codex 代码审查 |
-| [full-pipeline](workflows/full-pipeline.md) | 从 idea 到投稿 | OMP survey → AI4AI 优化 → auto-review 改文 |
+| [full-pipeline](workflows/full-pipeline.md) | 从 idea 到投稿 | OMP survey → AI4AI 有界调优 → auto-review 改文 |
 
 ## 笔记
 
@@ -53,7 +53,7 @@
 - [architecture.md](docs/architecture.md) — 各项目的架构拆解：为什么这样设计
 - [tool-comparison.md](docs/tool-comparison.md) — 横向对比：什么场景用什么工具
 - [personal-insights.md](docs/personal-insights.md) — 踩坑心得（上下文管理、发现记录、审稿循环）
-- [ai4ai-notes.md](docs/ai4ai-notes.md) — AI4AI（用 Agent 优化模型）思路
+- [ai4ai-notes.md](docs/ai4ai-notes.md) — AI4AI（Agent 驱动的有界超参数调优）思路
 
 ## 上游项目致谢
 
