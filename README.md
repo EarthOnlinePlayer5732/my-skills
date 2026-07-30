@@ -1,7 +1,6 @@
 # AI Research Automation Toolkit
 
-我在科研、实验和多模型协作里反复用到的一组 Claude Code skill。4 个是自己写的，7 个从上游固定 commit 同步。
-
+自用辅助工作流。
 ## 安装
 
 ```bash
