@@ -34,6 +34,25 @@ bash install.sh
 → /research-context-checkpoint checkpoint "本阶段完成"
 ```
 
+### 上下文状态管理
+
+`research-context-checkpoint` 只在用户显式调用时运行：
+
+| 模式 | 用途 | 主要结果 |
+|---|---|---|
+| `open [当前任务]` | 新会话开始、恢复长任务或核对上下文新鲜度 | 输出 context readback；首次使用时初始化状态 |
+| `checkpoint [保存原因]` | 约束、事实、风险或下一步发生实质变化后保存 | 先追加事件并备份旧 state，再更新当前状态 |
+| `rollback [回退原因]` | 最近一次 state 更新有误 | 恢复 `state.prev.md` 并追加 correction 事件 |
+
+项目运行时的最小状态：
+
+- `.research/state.md`：当前有效目标、约束、事实、活跃证据和恢复入口；
+- `.research/state.prev.md`：上一个 checkpoint，只支持一步上下文回退；
+- `.research/events.jsonl`：追加式事件与修正历史，不随 rollback 回退；
+- `.research/handoffs/`：面向具体任务和接收方裁剪的临时工作集。
+
+rollback 只恢复上下文摘要，不撤销代码、配置、实验结果或其他用户数据。项目已有同类状态系统时，应映射到现有结构，不并行创建第二套记录。
+
 ### 从上游同步的
 
 仓库收了 [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) 的 6 个 skill、配套 `shared-references`，以及 [GuDaStudio/skills](https://github.com/GuDaStudio/skills) 的 `collaborating-with-codex`。
