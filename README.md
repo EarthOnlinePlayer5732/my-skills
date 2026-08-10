@@ -7,11 +7,11 @@
 bash install.sh
 ```
 
-脚本只会吧仓库里的 skill 和共享文件复制到 `~/.claude/skills`。
+脚本只会把仓库里的 skill 和共享文件复制到 `~/.claude/skills`。
 
 ## Skill
 
-### 自己写的
+### 自制
 
 这 4 个 skill 共用一套 [科研记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md)。任务交接、实验事件、调优 trial 和复核结果都写进同一个 `.research/` 上下文，不用每换一个 Agent 就重新解释项目。
 
