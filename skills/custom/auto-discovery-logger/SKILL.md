@@ -62,6 +62,10 @@ source_paths:
 - 一项修改带来正向、负向或无变化结果；
 - 决定停止、回滚、扩大检查或设计新对照；
 - 发现此前记录使用了错误的代码、数据或统计口径。
+- 用户改变了会影响后续工作的硬约束；
+- 恢复任务时发现 state、Git 状态或原始证据不一致；
+- 交接因关键材料缺失而失败或产生误判；
+- 完成一次显式 context checkpoint。
 
 不要记录：
 
@@ -94,7 +98,7 @@ source_paths:
   "config_id": "...",
   "trial_id": "...",
   "run_id": "...",
-  "category": "anomaly|positive|negative|null_result|data_issue|implementation_issue|hypothesis|decision|correction",
+  "category": "anomaly|positive|negative|null_result|data_issue|implementation_issue|hypothesis|decision|correction|constraint_change|context_gap|handoff_failure|resume_mismatch|context_checkpoint",
   "status": "observed|reproduced|supported|contradicted|resolved|unknown",
   "observation": "原始材料直接显示了什么",
   "evidence": [
@@ -105,8 +109,15 @@ source_paths:
   "alternative_explanations": ["..."],
   "decision": "因此采取了什么动作；没有则写 none",
   "next_check": "用于区分主要解释的下一项验证",
+  "context_refs": [
+    ".research/state.md#用户决定与硬约束",
+    ".research/handoffs/..."
+  ],
+  "affects_current_state": true,
+  "target_state_section": ["用户决定与硬约束", "当前异常与风险"],
   "provenance": {
     "commit": "...",
+    "workspace_dirty": "true|false|unknown",
     "config": "...",
     "command": "...",
     "dataset_split": "...",
@@ -124,6 +135,9 @@ source_paths:
 - `alternative_explanations` 至少考虑一个合理替代解释；显然不适用时写空列表。
 - `decision` 只记录已经作出的决定，不把建议写成决定。
 - `evidence` 尽量指向原始日志、预测、配置、代码位置或计算结果。
+- `context_refs` 只引用与该事件直接相关的 state 章节、handoff、event、run 或专项账本。
+- `affects_current_state` 表示该事件是否需要在下一次 checkpoint 进入当前状态，不表示已经写入。
+- `target_state_section` 指出候选写入位置；不适用时使用空列表。
 
 ## 去重与修正
 
@@ -136,14 +150,17 @@ source_paths:
 
 ## 状态更新
 
-只有以下情况更新 `.research/state.md`：
+本 SKILL 默认只追加事件。将事件提升到 `.research/state.md` 时，提示用户调用 `/research-context-checkpoint checkpoint` 统一备份和更新。
 
-- 事件已复现或已有足够证据支持；
-- 现有假设被明确反驳；
-- 当前基线、代码版本或下一步计划发生变化；
-- 问题被验证修复。
+只有以下事件可以标记 `affects_current_state: true`：
 
-单次偶发现象保留在事件日志中，不直接提升为“已确认事实”。
+- 已复现或已有足够证据支持的事实；
+- 被明确反驳的现有假设；
+- 已生效的用户约束或决定；
+- 当前基线、代码版本、风险或下一步发生的实质变化；
+- 已验证修复的问题。
+
+单次偶发现象保留在事件日志中，不直接提升为“已确认事实”。紧急约束变化需要立即生效时，先记录 `constraint_change`，再立即提示用户执行 `/research-context-checkpoint checkpoint`，而不是绕过备份直接编辑 state。
 
 ## 会话结束摘要
 
@@ -169,6 +186,8 @@ source_paths:
 ```
 
 不要重复整份日志，不要为了完整感加入未经验证的结论。
+
+如果本次会话改变了当前状态，在摘要后提示用户执行 `/research-context-checkpoint checkpoint`；纯观察且不影响当前状态时不创建无意义 checkpoint。
 
 ## 安全与边界
 

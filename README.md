@@ -13,16 +13,26 @@ bash install.sh
 
 ### 自制
 
-这 4 个 skill 共用一套 [科研记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md)。任务交接、实验事件、调优 trial 和复核结果都写进同一个 `.research/` 上下文，不用每换一个 Agent 就重新解释项目。
+这 5 个 skill 共用一套 [科研记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md)。当前状态、任务交接、实验事件、调优 trial 和复核结果都写进同一个 `.research/` 上下文，不用每换一个 Agent 就重新解释项目。
 
 | Skill | 做什么 | 命令 |
 |---|---|---|
+| [research-context-checkpoint](skills/custom/research-context-checkpoint/SKILL.md) | 打开、保存或一步回退当前项目上下文 | `/research-context-checkpoint` |
 | [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 用于跨会窗口/agent的上下文交接。 | `/context-handoff-checklist` |
 | [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 自动记录工作中的一些观察、假设、决定和负面结果，保留一定的前后因果 | `/auto-discovery-logger` |
 | [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 在固定数据划分和硬预算内自动生成、运行、比较超参数 trial，支持 `plan`、`tune`、`resume` 和 `report` | `/ai4ai-model-optimizer` |
 | [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 多模型交叉审核 | `/cross-model-verifier` |
 
 手工复制其中一个时，把 `skills/custom/_shared/` 一起复制。否则相对引用会断。
+
+普通长任务的最小闭环：
+
+```text
+/research-context-checkpoint open "当前任务"
+→ /auto-discovery-logger "本轮分析"
+→ 按需 /context-handoff-checklist "接收方与任务"
+→ /research-context-checkpoint checkpoint "本阶段完成"
+```
 
 ### 从上游同步的
 
@@ -45,7 +55,7 @@ bash install.sh
 
 | 文件 | 用在什么场景 | 组合方式 |
 |---|---|---|
-| [remote-experiment-loop](workflows/remote-experiment-loop.md) | 远程 GPU 训练，本地收集和分析结果 | `auto-discovery-logger` + `context-handoff-checklist` |
+| [remote-experiment-loop](workflows/remote-experiment-loop.md) | 远程 GPU 训练，本地收集和分析结果 | `research-context-checkpoint` + `auto-discovery-logger` + `context-handoff-checklist` |
 | [overnight-research](workflows/overnight-research.md) | 睡前启动有界任务，第二天检查结果 | `auto-review-loop` + 项目级权限和预算 |
 | [multi-agent-review](workflows/multi-agent-review.md) | 投稿前终审 | Claude 自评 + GPT 审稿 + Codex 代码检查 |
 | [full-pipeline](workflows/full-pipeline.md) | 从 idea 走到投稿 | OMP survey + AI4AI 有界调优 + auto-review 改稿 |

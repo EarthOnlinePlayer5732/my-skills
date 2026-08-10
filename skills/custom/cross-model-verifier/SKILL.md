@@ -91,7 +91,24 @@ sensitive_material_policy:
 
 对大型文件提供路径、哈希和抽样说明，不要只复制汇总数字。
 
-## 第三步：确定性检查优先
+## 第三步：上下文完整性检查
+
+正式审计前先检查：
+
+- `state.md` 的 branch、commit 和 dirty 状态是否对应当前材料；
+- 关键判断是否能追溯到原始证据、事件、run 或专项账本；
+- 是否仍在使用已被 supersede 的约束、决定或结论；
+- 必需输入、配置、评价定义或运行记录是否缺失；
+- 多个 reviewer 是否收到同一版证据包，以及包内是否声明省略内容和缺口。
+
+上下文不完整时：
+
+1. 在审计报告中说明缺口及其可能影响；
+2. 追加 `context_gap` 或 `resume_mismatch` 事件；
+3. 将受影响结论标记为 `UNRESOLVED` 或 `NOT_CHECKED`；
+4. 需要更新当前状态时，提示用户调用 `/research-context-checkpoint checkpoint`，不要在审计中静默改写历史。
+
+## 第四步：确定性检查优先
 
 ### A. 运行对应关系
 
@@ -153,7 +170,7 @@ sensitive_material_policy:
 - 是否把均值差异直接写成稳定改进；
 - 多重比较、随机种子和域间异质性是否需要考虑。
 
-## 第四步：独立模型审查
+## 第五步：独立模型审查
 
 只有完成或明确缺失确定性检查后，再使用多个模型。
 
@@ -180,7 +197,7 @@ sensitive_material_policy:
 
 模型未读取原始数据或无法执行代码时，不得将其意见标记为重算或复现。
 
-## 第五步：处理分歧
+## 第六步：处理分歧
 
 把分歧分为：
 
@@ -191,7 +208,7 @@ sensitive_material_policy:
 
 “三个模型中两个同意”不构成更强证据。只有证据来源独立、可检查且方法合理时，结论强度才提高。
 
-## 第六步：生成报告
+## 第七步：生成报告
 
 默认写入：
 
@@ -207,6 +224,13 @@ sensitive_material_policy:
 ## 审计范围
 
 ## 可用与缺失材料
+
+## 上下文完整性检查
+- state 与 Git 新鲜度：
+- 证据引用完整性：
+- 已 supersede 内容：
+- reviewer 证据包一致性：
+- 上下文缺口及影响：
 
 ## 结论摘要
 | 问题 | 结论 | 证据等级 | 主要依据 | 限制 |
@@ -241,9 +265,10 @@ sensitive_material_policy:
 
 ## 写回项目状态
 
-- `RECOMPUTED`、`CHECKED` 或有充分证据的 `SUPPORTED` 结论按上表映射后，可以更新 `.research/state.md`；
-- `UNRESOLVED`、`NOT_CHECKED` 和模型提出的候选问题按 `unknown` 写入未决问题；
-- 被推翻的旧结论通过新事件引用并修正，不静默删除历史记录。
+- `RECOMPUTED`、`CHECKED` 或有充分证据的 `SUPPORTED` 结论按上表映射后，可以标记为待 checkpoint 的当前状态变化；
+- `UNRESOLVED`、`NOT_CHECKED` 和模型提出的候选问题按 `unknown` 记录为事件或未决项；
+- 被推翻的旧结论通过新事件引用并修正，不静默删除历史记录；
+- 审计事件写入后，提示用户使用 `/research-context-checkpoint checkpoint` 统一备份并更新 `.research/state.md`。
 
 ## 非目标
 
