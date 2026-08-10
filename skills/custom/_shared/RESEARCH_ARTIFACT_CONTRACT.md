@@ -1,6 +1,6 @@
 # 科研工作流共享记录约定
 
-五个自定义 SKILL 共用同一套项目状态和证据记录，避免每个工具维护一份互不相通的上下文。
+除独立的 `context-handoff` 外，其余四个自定义 SKILL 共用同一套项目状态和证据记录，避免每个工具维护一份互不相通的上下文。`context-handoff` 可以把这些记录作为普通的可选来源，但不依赖本约定。
 
 ## 默认目录
 
@@ -9,7 +9,6 @@
 ├── state.md                 # 当前研究状态，面向人阅读
 ├── state.prev.md            # 上一个 checkpoint，只用于一步上下文回退
 ├── events.jsonl             # 追加式事件记录，面向工具读取
-├── handoffs/                # 跨 Agent / 跨模型交接包
 ├── tuning/                  # 有界超参数调优规格、状态与 trial 账本
 ├── runs/                    # 每次实验的运行清单与结果卡
 └── audits/                  # 复核与审计报告
@@ -24,9 +23,9 @@
 1. **原始证据**：代码、配置、日志、结果和数据清单，是事实来源。
 2. **当前状态**：`.research/state.md`，保存当前仍然有效的目标、约束、事实、风险和恢复入口。
 3. **历史记录**：`.research/events.jsonl`，追加保存观察、决定、修正和上下文变化。
-4. **任务工作集**：`.research/handoffs/*.md`，为特定接收方和成功标准裁剪出的临时证据包。
+4. **可选任务工作集**：独立 `context-handoff` 默认写入 `.handoffs/*.md`，为特定接收方和成功标准裁剪临时证据包。
 
-`state.md` 不是原始证据，也不复制完整历史。它只保留当前有效内容和少量活跃证据指针。handoff 不是新的权威状态；任务结束后仍以原始证据、事件和专项账本为准。
+`state.md` 不是原始证据，也不复制完整历史。它只保留当前有效内容和少量活跃证据指针。可选 handoff 不是新的权威状态；任务结束后仍以原始证据、事件和专项账本为准。
 
 执行以下规则：
 
@@ -106,7 +105,7 @@ last_context_event:
 - 出现什么情况时停止并重新核对状态：
 ```
 
-`state.md` 建议控制在 100—150 行。详细过程、旧约束、完整 trial 和审计内容留在事件、handoff、专项账本和原始产物中。
+`state.md` 建议控制在 100—150 行。详细过程、旧约束、完整 trial 和审计内容留在事件、可选 handoff、专项账本和原始产物中。
 
 ## 证据状态
 
@@ -163,7 +162,7 @@ last_context_event:
 - 不把每个 trial 重复写入全局 `events.jsonl`；只追加开始、暂停、完整性失效、预算耗尽、确认最佳和最终测试等关键事件。
 - `state.md` 只保存当前调优摘要和权威目录引用，不复制完整 trial 历史。
 
-## 五个 SKILL 的状态流
+## 四个共享状态 SKILL 与可选 handoff
 
 ```text
 research-context-checkpoint open
@@ -171,8 +170,8 @@ research-context-checkpoint open
 
              ↓
 
-context-handoff-checklist
-    按任务裁剪 state 和证据，生成交接包
+context-handoff（可选、独立）
+    按任务读取 state 或其他来源，默认生成 .handoffs/ 交接包
 
              ↓
 

@@ -13,26 +13,40 @@ bash install.sh
 
 ### 自制
 
-这 5 个 skill 共用一套 [科研记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md)。当前状态、任务交接、实验事件、调优 trial 和复核结果都写进同一个 `.research/` 上下文，不用每换一个 Agent 就重新解释项目。
+这 5 个 skill 中，`context-handoff` 可以单独复制使用，零强制依赖；其余 4 个使用同一套 [科研记录约定](skills/custom/_shared/RESEARCH_ARTIFACT_CONTRACT.md) 管理项目状态、实验事件、调优 trial 和复核结果。
 
 | Skill | 做什么 | 命令 |
 |---|---|---|
 | [research-context-checkpoint](skills/custom/research-context-checkpoint/SKILL.md) | 打开、保存或一步回退当前项目上下文 | `/research-context-checkpoint` |
-| [context-handoff-checklist](skills/custom/context-handoff-checklist/SKILL.md) | 用于跨会窗口/agent的上下文交接。 | `/context-handoff-checklist` |
+| [context-handoff](skills/custom/context-handoff/SKILL.md) | 为一次委托裁剪上下文、证据和权限边界，也可检查接收确认与返回结果 | `/context-handoff` |
 | [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 自动记录工作中的一些观察、假设、决定和负面结果，保留一定的前后因果 | `/auto-discovery-logger` |
 | [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 在固定数据划分和硬预算内自动生成、运行、比较超参数 trial，支持 `plan`、`tune`、`resume` 和 `report` | `/ai4ai-model-optimizer` |
 | [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 多模型交叉审核 | `/cross-model-verifier` |
 
-手工复制其中一个时，把 `skills/custom/_shared/` 一起复制。否则相对引用会断。
+手工安装 `context-handoff` 时只需复制它自己的目录。安装其余自定义 skill 时，把 `skills/custom/_shared/` 一起复制，避免共享约定的相对引用断开。
 
 普通长任务的最小闭环：
 
 ```text
 /research-context-checkpoint open "当前任务"
 → /auto-discovery-logger "本轮分析"
-→ 按需 /context-handoff-checklist "接收方与任务"
+→ 按需 /context-handoff create "接收方与任务"
 → /research-context-checkpoint checkpoint "本阶段完成"
 ```
+
+### 独立任务交接
+
+`context-handoff` 默认生成：
+
+```text
+.handoffs/YYYYMMDD-HHMM-<recipient>-<task>.md
+```
+
+它从用户要求、仓库、日志和结果中按任务收集材料，使用文件位置、commit 和 run ID 等稳定句柄，显式记录选入原因、上下文缺口、权限和预算。`.research/state.md`、`events.jsonl`、`tuning/` 和 `audits/` 存在时只是可选来源；不存在时不会初始化，也不影响使用。
+
+除默认的 `create` 外，还可用 `receive` 先复述任务与操作范围，用 `review` 对照成功标准检查返回结果。向外部模型发送 handoff 仍需单独授权。
+
+从旧版升级后，如果 `~/.claude/skills/context-handoff-checklist/` 仍存在，可在确认不再使用旧命令后手动删除，避免同时显示新旧两个 Skill。
 
 ### 上下文状态管理
 
@@ -49,7 +63,6 @@ bash install.sh
 - `.research/state.md`：当前有效目标、约束、事实、活跃证据和恢复入口；
 - `.research/state.prev.md`：上一个 checkpoint，只支持一步上下文回退；
 - `.research/events.jsonl`：追加式事件与修正历史，不随 rollback 回退；
-- `.research/handoffs/`：面向具体任务和接收方裁剪的临时工作集。
 
 rollback 只恢复上下文摘要，不撤销代码、配置、实验结果或其他用户数据。项目已有同类状态系统时，应映射到现有结构，不并行创建第二套记录。
 
@@ -74,7 +87,7 @@ rollback 只恢复上下文摘要，不撤销代码、配置、实验结果或�
 
 | 文件 | 用在什么场景 | 组合方式 |
 |---|---|---|
-| [remote-experiment-loop](workflows/remote-experiment-loop.md) | 远程 GPU 训练，本地收集和分析结果 | `research-context-checkpoint` + `auto-discovery-logger` + `context-handoff-checklist` |
+| [remote-experiment-loop](workflows/remote-experiment-loop.md) | 远程 GPU 训练，本地收集和分析结果 | `research-context-checkpoint` + `auto-discovery-logger`；按需独立使用 `context-handoff` |
 | [overnight-research](workflows/overnight-research.md) | 睡前启动有界任务，第二天检查结果 | `auto-review-loop` + 项目级权限和预算 |
 | [multi-agent-review](workflows/multi-agent-review.md) | 投稿前终审 | Claude 自评 + GPT 审稿 + Codex 代码检查 |
 | [full-pipeline](workflows/full-pipeline.md) | 从 idea 走到投稿 | OMP survey + AI4AI 有界调优 + auto-review 改稿 |

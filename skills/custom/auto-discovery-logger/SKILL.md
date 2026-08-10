@@ -111,7 +111,7 @@ source_paths:
   "next_check": "用于区分主要解释的下一项验证",
   "context_refs": [
     ".research/state.md#用户决定与硬约束",
-    ".research/handoffs/..."
+    ".handoffs/..."
   ],
   "affects_current_state": true,
   "target_state_section": ["用户决定与硬约束", "当前异常与风险"],
@@ -135,7 +135,7 @@ source_paths:
 - `alternative_explanations` 至少考虑一个合理替代解释；显然不适用时写空列表。
 - `decision` 只记录已经作出的决定，不把建议写成决定。
 - `evidence` 尽量指向原始日志、预测、配置、代码位置或计算结果。
-- `context_refs` 只引用与该事件直接相关的 state 章节、handoff、event、run 或专项账本。
+- `context_refs` 只引用与该事件直接相关且确实存在的 state 章节、独立 handoff、event、run 或专项账本；没有 handoff 时不创建占位引用。
 - `affects_current_state` 表示该事件是否需要在下一次 checkpoint 进入当前状态，不表示已经写入。
 - `target_state_section` 指出候选写入位置；不适用时使用空列表。
 

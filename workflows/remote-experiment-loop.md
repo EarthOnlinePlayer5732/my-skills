@@ -2,7 +2,7 @@
 
 ## 概述
 
-日常科研中最常见的场景：代码和实验跑在远程 GPU 服务器上，本地用 Claude Code 做分析、调试和迭代。这个 workflow 用 research-context-checkpoint 打开和保存当前状态，用 context-handoff-checklist 解决子 Agent 上下文问题，用 auto-discovery-logger 保留重要发现，形成一个可恢复的实验迭代闭环。
+日常科研中最常见的场景：代码和实验跑在远程 GPU 服务器上，本地用 Claude Code 做分析、调试和迭代。这个 workflow 可以用 research-context-checkpoint 打开和保存当前状态、用 auto-discovery-logger 保留重要发现；需要委托时，context-handoff 独立生成任务相关的证据包。三者可以组合，但 context-handoff 不依赖另外两个 Skill。
 
 ## 实际流程
 
@@ -17,7 +17,7 @@
      │                                       │
      │  4. 决定修改方案                        │
      │     ├─ 需要 Codex 意见？                │
-     │     │  → context-handoff-checklist     │
+     │     │  → context-handoff               │
      │     │  → 发送经授权、裁剪和脱敏的证据包    │
      │     │  → 收到反馈，综合判断              │
      │     └─ 自己能决定？直接改               │
@@ -55,8 +55,8 @@ claude
 ### Step 4: 需要外部意见时
 
 ```bash
-# 激活上下文 checklist
-> /context-handoff-checklist "让 Codex 分析 Restaurant 领域 F1 偏低的原因"
+# 生成独立 handoff
+> /context-handoff create "让 Codex 分析 Restaurant 领域 F1 偏低的原因"
 
 # skill 会按任务类型补齐代码版本、证据位置和操作边界
 # 发送外部模型前还会确认授权，并裁剪、脱敏材料
@@ -92,17 +92,17 @@ claude
 > /research-context-checkpoint checkpoint "完成第 N 轮结果分析"
 ```
 
-下一轮重新执行 `open`，结合 `state.md`、相关事件编号和“恢复入口”继续。项目已有日志规范时，按共享约定映射到现有文件，不并行创建第二套记录。
+下一轮重新执行 `open`，结合 `state.md`、相关事件编号和“恢复入口”继续。项目已有日志规范时，按共享约定映射到现有文件，不并行创建第二套记录。即使项目没有 `.research/`，`context-handoff` 仍可直接从仓库、日志和结果生成 `.handoffs/` 文件。
 
 ## 核心原则
 
 1. **每轮开始执行 research-context-checkpoint open** — 核对当前状态和上下文新鲜度
 2. **长任务和实验分析启用 auto-discovery-logger** — 只记录会影响判断的观察、假设、决定和负面结果
-3. **跨模型协作使用 context-handoff-checklist** — 交付可定位的证据和明确操作边界
+3. **跨模型协作按需独立使用 context-handoff** — 交付可定位的证据和明确操作边界
 4. **每轮结束执行 research-context-checkpoint checkpoint** — 备份旧状态，再整理当前有效内容和恢复入口
 
 ## 与上游工具的整合
 
 - 如果用了 auto-review-loop：把已复现或有充分证据的事件编号加入下一轮 review 上下文
 - 如果用了 Oh-my-paper：将 `.research/` 字段映射到现有 `execution_context.md` 等状态文件
-- 如果都没用：使用 `.research/events.jsonl`、`.research/state.md` 和运行清单形成最小可追溯闭环
+- 如果没有 `.research/`：context-handoff 仍可读取项目现有的代码、日志、结果和任务记录；长期状态继续由项目自身管理
