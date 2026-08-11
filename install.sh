@@ -37,11 +37,14 @@ for skill in "$SCRIPT_DIR"/skills/upstream/*/; do
     echo -e "${GREEN}✓${NC} $name (upstream)"
 done
 
-legacy_handoff_dir="$SKILL_DIR/context-handoff-checklist"
-if [[ -d "$legacy_handoff_dir" ]]; then
-    echo -e "${YELLOW}!${NC} Legacy skill still exists: $legacy_handoff_dir"
-    echo "  Remove it manually after confirming you no longer need /context-handoff-checklist."
-fi
+legacy_handoff_names=("context-handoff-checklist" "context-handoff")
+for legacy_handoff_name in "${legacy_handoff_names[@]}"; do
+    legacy_handoff_dir="$SKILL_DIR/$legacy_handoff_name"
+    if [[ -d "$legacy_handoff_dir" ]]; then
+        echo -e "${YELLOW}!${NC} Legacy skill still exists: $legacy_handoff_dir"
+        echo "  Remove it manually after confirming you no longer need /$legacy_handoff_name."
+    fi
+done
 
 # 安装自定义 skill 共用的支持文件
 shared_dir="$SCRIPT_DIR/skills/custom/_shared"
@@ -63,4 +66,4 @@ echo -e "${GREEN}=== Done! ${NC}Installed to $SKILL_DIR"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Start Claude Code in your project directory"
-echo "  2. Try: /context-handoff create 'handoff this task'"
+echo "  2. Try: /handoff create 'handoff this task'"

@@ -10,7 +10,7 @@ sender: <name-or-agent>|unknown
 status: prepared
 ---
 
-# Context Handoff: <task>
+# Handoff: <task>
 
 ## 任务定义
 

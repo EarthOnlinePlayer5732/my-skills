@@ -1,5 +1,5 @@
 ---
-name: context-handoff
+name: handoff
 description: "Create, receive, or review a self-contained context handoff for a non-trivial task. Use for cross-agent or cross-model delegation, long-task resumption, code review, debugging, implementation, experiment analysis, or any task where the recipient needs a curated working set, evidence handles, permissions, and explicit context gaps. Works without .research files or any other custom skill."
 allowed-tools:
   - Read
@@ -8,7 +8,7 @@ allowed-tools:
   - Write
 ---
 
-# Context Handoff
+# Handoff
 
 为一次具体委托组装最小但充分的上下文工作集。handoff 文件本身必须足以让新 Agent 或新会话开始工作，不依赖 `.research/`、logger、verifier、optimizer、checkpoint 或其他自定义 Skill。
 
