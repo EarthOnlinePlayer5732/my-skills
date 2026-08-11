@@ -1,6 +1,6 @@
 # AI Research Automation Toolkit
 
-自用辅助工作流。
+AI辅助工作流。
 ## 安装
 
 ```bash
