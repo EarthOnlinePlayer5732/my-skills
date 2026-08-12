@@ -18,7 +18,7 @@ bash install.sh
 | Skill | 做什么 | 命令 |
 |---|---|---|
 | [research-context-checkpoint](skills/custom/research-context-checkpoint/SKILL.md) | 打开、保存或一步回退当前项目上下文 | `/research-context-checkpoint` |
-| [handoff](skills/custom/handoff/SKILL.md) | 为一次委托裁剪上下文、证据和权限边界，也可检查接收确认与返回结果 | `/handoff` |
+| [handoff](skills/custom/handoff/SKILL.md) | 为委托压缩裁剪上下文、整理历史会话上下文中的实验结果、结论、相关证据以及权限边界 | `/handoff` |
 | [auto-discovery-logger](skills/custom/auto-discovery-logger/SKILL.md) | 自动记录工作中的一些观察、假设、决定和负面结果，保留一定的前后因果 | `/auto-discovery-logger` |
 | [ai4ai-model-optimizer](skills/custom/ai4ai-model-optimizer/SKILL.md) | 在固定数据划分和硬预算内自动生成、运行、比较超参数 trial，支持 `plan`、`tune`、`resume` 和 `report` | `/ai4ai-model-optimizer` |
 | [cross-model-verifier](skills/custom/cross-model-verifier/SKILL.md) | 多模型交叉审核 | `/cross-model-verifier` |
